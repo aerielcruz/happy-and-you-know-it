@@ -12,90 +12,74 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css" />
         <style>
-            html, body {width: 100%; box-sizing: content-box;}
-            #snap_button {margin-top: 10px; width: 100%;}
-            #button_row {width: 100%;}
-            .button, button {width: 100%;}
-            .container {margin: 0 auto; padding: 0; width: 100%;}
-            .row {}
-            video, img {transform: scaleX(-1);}
-            
+            html, body {font-family: Arial, sans-serif; padding: 0;}
+            #snap_button {
+                margin-top: 10px;
+                width: 100%
+            }
+            #button_row {
+                width: 100%;
+                max-width: 240px;
+            }
+            button {width: 100%; background-color: #000;}
+            button:hover {background-color: #000;}
+
+            /*video, img {-webkit-transform: scaleX(-1); transform: scaleX(-1);}*/
+            video {transform: rotateY(180deg); -webkit-transform:rotateY(180deg); -moz-transform:rotateY(180deg);}
         </style>
     </head>
 
     <body>
         <div class="container">
+            <h1 style="font-size: 18px; text-align: center; background: #000; color: #fff; margin-top: 20px; font-weight: bold; padding: 10px;"> Facial Emotion Recognition </h1>
+            
+            <h3 id="ans"></h3>
+            <div id="camera" style=""></div>
             <!--
-            <h1> Facial Emotion Recognition </h1>
+            <div class="row" id="button_row"> <button id="snap_button" class="button button-outline"> snap </button> </div>
             -->
-            <div class="row">
-                
-                <div class="column">
-                    <div class="row"> <div id="camera"></div> </div>
-                    <div class="row" id="button_row"> <button id="snap_button" class="button button-outline"> snap </button> </div>
-                </div>
-
-                <div class="column">
-                    <div id="results"></div>
-
-                    <div id="prediction" style="padding: 10px;">
-                        <p id="ans"></p>
-                        <table>
-                            <tr>
-                                <th>Anger</th> <td id="Angry"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Disgust</th> <td id="Disgust"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Fear</th> <td id="Fear"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Happiness</th> <td id="Happy"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Sadness</th> <td id="Sad"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Surprise</th> <td id="Surprise"></td>
-                            </tr>
-
-                            <tr>
-                                <th>Neutral</th> <td id="Neutral"></td>
-                            </tr>                
-                        </table>
-                    </div>
-                </div>
+            <div>
+                <button id="snap_button" style="border: 1px solid #000; padding-bottom: 10px; font-size: 15px;"> SNAP </button>
+            </div>
+       
+            <style>
+                #prediction p {color: #fff; font-size: 1px;}
+                h3 {border: 1px solid #000; padding: 10px; font-size: 20px; text-align: center; font-weight: bold;}
+            </style>
+            <div id="results"></div>
+            <div id="prediction">
+                <p id="Angry"></p>
+                <p id="Disgust"></p>
+                <p id="Fear"></p>
+                <p id="Happy"></p>
+                <p id="Sad"></p>
+                <p id="Surprise"></p>
+                <p id="Neutral"></p>
             </div>
         </div>
-        
-        
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.18/webcam.js" integrity="sha256-DrW2nWeSzECQXZQg6WEE2VL9TGumizCwJwrTUwOJT+E=" crossorigin="anonymous"></script>
         <script language="JavaScript">
             Webcam.set({
-                width: 640, // 320
-                height: 640, // 240
-                //crop_width: 48,
-			    //crop_height: 48,
-                dest_width: 640, // 64
-                dest_height: 640, // 48
+                width: 670, // 320
+                height: 670, // 240
+                crop_width: 48, // 48
+                crop_height: 48, // 48
+                dest_width: 100, // 64
+                dest_height: 100, // 48
                 image_format: "png",
                 jpeg_quality: 100
             });
             Webcam.attach("#camera");
             function take_snapshot() {
-			// take snapshot and get image data
+            // take snapshot and get image data
                 Webcam.snap( function(data_uri) {
                     // display results in page
+                    /*
                     document.getElementById("results").innerHTML = 
                         "<h2> Image captured </h2>" + 
                         '<img src="'+data_uri+'"/>';
+                        */
                     var xhr = new XMLHttpRequest();
                     xhr.open("POST", "/classify");
                     xhr.setRequestHeader("Content-Type", "application/json");
@@ -105,6 +89,57 @@
                             var emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"];
                             for(var i=0; i<emotions.length; i++) {
                                 document.getElementById(emotions[i]).textContent = Math.round(100 * response["prediction"][emotions[i]], 2) + "%";
+                                console.log(response["prediction"][emotions[i]]);
+                            }
+
+                            if(response["prediction"][emotions[0]]>response["prediction"][emotions[1]] 
+                                && response["prediction"][emotions[0]]>response["prediction"][emotions[2]] 
+                                && response["prediction"][emotions[0]]>response["prediction"][emotions[3]]
+                                && response["prediction"][emotions[0]]>response["prediction"][emotions[4]]
+                                && response["prediction"][emotions[0]]>response["prediction"][emotions[5]]
+                                && response["prediction"][emotions[0]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Anger";
+
+                            }
+                            else if(response["prediction"][emotions[1]]>response["prediction"][emotions[2]] 
+                                && response["prediction"][emotions[1]]>response["prediction"][emotions[3]]
+                                && response["prediction"][emotions[1]]>response["prediction"][emotions[4]]
+                                && response["prediction"][emotions[1]]>response["prediction"][emotions[5]]
+                                && response["prediction"][emotions[1]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Disgust";
+
+                            }
+                            else if(response["prediction"][emotions[2]]>response["prediction"][emotions[3]]
+                                && response["prediction"][emotions[2]]>response["prediction"][emotions[4]]
+                                && response["prediction"][emotions[2]]>response["prediction"][emotions[5]]
+                                && response["prediction"][emotions[2]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Fear";
+
+                            }
+                            else if(response["prediction"][emotions[3]]>response["prediction"][emotions[4]]
+                                && response["prediction"][emotions[3]]>response["prediction"][emotions[5]]
+                                && response["prediction"][emotions[3]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Happiness";
+
+                            }
+                            else if(response["prediction"][emotions[4]]>response["prediction"][emotions[5]]
+                                && response["prediction"][emotions[4]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Sadness";
+
+                            }
+                            else if(response["prediction"][emotions[5]]>response["prediction"][emotions[6]])
+                            {
+                                document.getElementById("ans").innerHTML = "Surprise";
+
+                            }
+                            else
+                            {
+                                document.getElementById("ans").innerHTML = "Neutral";
                             }
                             
                             if(emotions[0]>emotions[1] && emotions[0]>emotions[2] && emotions[0]>emotions[3] && emotions[4]>emotions[5] && emotions[0]>emotions[6])
@@ -123,7 +158,7 @@
 
 
             document.getElementById("snap_button").addEventListener("click", take_snapshot);
-	    </script>
+        </script>
 
     </body>
 
