@@ -6,25 +6,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/purple/pace-theme-minimal.css" />
+        <!--
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css" />
         <style>
-            #snap_button {
-                margin-top: 10px;
-                width: 100%
-            }
-            #button_row {
-                width: 100%;
-                max-width: 240px;
-            }
+            html, body {width: 100%; box-sizing: content-box;}
+            #snap_button {margin-top: 10px; width: 100%;}
+            #button_row {width: 100%;}
+            .button, button {width: 100%;}
+            .container {margin: 0 auto; padding: 0; width: 100%;}
+            .row {}
+            video, img {transform: scaleX(-1);}
             
         </style>
     </head>
 
     <body>
         <div class="container">
+            <!--
             <h1> Facial Emotion Recognition </h1>
+            -->
             <div class="row">
                 
                 <div class="column">
@@ -35,7 +38,8 @@
                 <div class="column">
                     <div id="results"></div>
 
-                    <div id="prediction">
+                    <div id="prediction" style="padding: 10px;">
+                        <p id="ans"></p>
                         <table>
                             <tr>
                                 <th>Anger</th> <td id="Angry"></td>
@@ -75,12 +79,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.18/webcam.js" integrity="sha256-DrW2nWeSzECQXZQg6WEE2VL9TGumizCwJwrTUwOJT+E=" crossorigin="anonymous"></script>
         <script language="JavaScript">
             Webcam.set({
-                width: 320,
-                height: 240,
-                crop_width: 48,
-			    crop_height: 48,
-                dest_width: 64,
-                dest_height: 48,
+                width: 640, // 320
+                height: 640, // 240
+                //crop_width: 48,
+			    //crop_height: 48,
+                dest_width: 640, // 64
+                dest_height: 640, // 48
                 image_format: "png",
                 jpeg_quality: 100
             });
@@ -103,15 +107,20 @@
                                 document.getElementById(emotions[i]).textContent = Math.round(100 * response["prediction"][emotions[i]], 2) + "%";
                             }
                             
+                            if(emotions[0]>emotions[1] && emotions[0]>emotions[2] && emotions[0]>emotions[3] && emotions[4]>emotions[5] && emotions[0]>emotions[6])
+                            {
+                                document.getElementById("ans").innerHTML = "Anger";
+                            }
+                            
                         }
                     };
                     xhr.send(JSON.stringify({
                         image: data_uri
                     }));
                 } );
-
-                
             }
+
+
 
             document.getElementById("snap_button").addEventListener("click", take_snapshot);
 	    </script>
